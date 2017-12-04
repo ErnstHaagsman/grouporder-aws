@@ -27,7 +27,7 @@ resource "aws_security_group" "management_host" {
 }
 
 resource "aws_security_group" "web" {
-  name        = "management_host"
+  name        = "web"
   description = "Allow inbound HTTP and HTTPS traffic"
   vpc_id      = "${aws_vpc.grouporder_vpc.id}"
 
@@ -42,8 +42,8 @@ resource "aws_security_group" "web" {
   }
 
   ingress {
-    from_port   = 80
-    to_port     = 80
+    from_port   = 5000
+    to_port     = 5000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
     description = "Incoming HTTP traffic"
@@ -111,9 +111,47 @@ resource "aws_instance" "management" {
     "${aws_security_group.management_host.id}"
   ]
 
+  tags {
+    Name = "Management Host"
+  }
+
   provisioner "file" {
     content = "${data.template_file.inventory.rendered}"
-    destination = "/etc/ansible/inventory"
+    destination = "/home/ubuntu/inventory"
+
+    connection {
+      user = "ubuntu"
+      agent = true
+    }
+  }
+
+  provisioner "file" {
+    destination = "/home/ubuntu/.ansible.cfg"
+    source = "ansible.cfg"
+
+    connection {
+      user = "ubuntu"
+      agent = true
+    }
+  }
+
+  provisioner "file" {
+    destination = "/home/ubuntu/deploy.yml"
+    source = "deploy.yml"
+
+    connection {
+      user = "ubuntu"
+      agent = true
+    }
+  }
+
+  provisioner "remote-exec" {
+    script = "install.sh"
+
+    connection {
+      user = "ubuntu"
+      agent = true
+    }
   }
 }
 
@@ -128,6 +166,10 @@ resource "aws_instance" "database" {
   security_groups = [
     "${aws_security_group.db.id}"
   ]
+
+  tags {
+    Name = "Grouporder Database"
+  }
 }
 
 resource "aws_instance" "web" {
@@ -141,4 +183,8 @@ resource "aws_instance" "web" {
   security_groups = [
     "${aws_security_group.web.id}"
   ]
+
+  tags {
+    Name = "Grouporder Web"
+  }
 }

@@ -4,3 +4,4 @@ venv/
 *.tfstate
 *.backup
 terraform.tfvars
+*.out
