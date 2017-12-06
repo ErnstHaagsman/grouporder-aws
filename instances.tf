@@ -2,8 +2,28 @@ variable "key" {
   type = "string"
 }
 
+variable "aws_region" {
+  type = "string"
+}
+
 provider "aws" {
-  region = "eu-central-1"
+  region = "${var.aws_region}"
+}
+
+data "aws_ami" "ubuntu_1604" {
+  most_recent = true
+
+  filter {
+    name = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"]
+  }
+
+  filter {
+    name = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = ["099720109477"]  # Canonical's owner ID
 }
 
 resource "aws_security_group" "management_host" {
@@ -92,7 +112,7 @@ resource "aws_security_group" "db" {
 }
 
 resource "aws_instance" "management" {
-  ami = "ami-df8406b0" # Ubuntu 16.04
+  ami = "${data.aws_ami.ubuntu_1604.id}"
   instance_type = "t2.micro"
 
   key_name = "${var.key}"
@@ -148,7 +168,7 @@ resource "aws_instance" "management" {
 }
 
 resource "aws_instance" "database" {
-  ami = "ami-df8406b0" # Ubuntu 16.04
+  ami = "${data.aws_ami.ubuntu_1604.id}"
   instance_type = "t2.micro"
 
   key_name = "${var.key}"
@@ -165,7 +185,7 @@ resource "aws_instance" "database" {
 }
 
 resource "aws_instance" "web" {
-  ami = "ami-df8406b0" # Ubuntu 16.04
+  ami = "${data.aws_ami.ubuntu_1604.id}"
   instance_type = "t2.micro"
 
   key_name = "${var.key}"
