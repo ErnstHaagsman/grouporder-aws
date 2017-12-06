@@ -119,7 +119,7 @@ resource "aws_instance" "management" {
 
   subnet_id = "${aws_subnet.public_subnet.id}"
 
-  security_groups = [
+  vpc_security_group_ids = [
     "${aws_security_group.management_host.id}"
   ]
 
@@ -175,7 +175,7 @@ resource "aws_instance" "database" {
 
   subnet_id = "${aws_subnet.private_subnet.id}"
 
-  security_groups = [
+  vpc_security_group_ids = [
     "${aws_security_group.db.id}"
   ]
 
@@ -192,7 +192,7 @@ resource "aws_instance" "web" {
 
   subnet_id = "${aws_subnet.public_subnet.id}"
 
-  security_groups = [
+  vpc_security_group_ids = [
     "${aws_security_group.web.id}"
   ]
 
@@ -200,3 +200,4 @@ resource "aws_instance" "web" {
     Name = "Grouporder Web"
   }
 }
+
