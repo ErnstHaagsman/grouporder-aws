@@ -8,9 +8,6 @@
 
 - hosts: all
   become: yes
-  vars:
-    venv_dir: /home/vagrant/venv
-    requirements_file: /vagrant/requirements.txt
   roles:
     - { role: common }
 
